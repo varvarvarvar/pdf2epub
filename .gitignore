@@ -1,0 +1,7 @@
+*.epub
+*.pdf
+*.txt
+!requirements.txt
+.DS_Store
+.ipynb_checkpoints
+env
