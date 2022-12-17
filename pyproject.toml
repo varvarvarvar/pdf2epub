@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "pdf2txt2epub"
+version = "0.1.0"
+description = "PDF to EPUB converter."
+authors = ["varvara-krasavina <varvara.krasavina@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pdf2image = "^1.14.0"
+pypandoc = "^1.5"
+pytesseract = "^0.3.7"
+tqdm = "^4.60.0"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.11.2"
+black = "^22.12.0"
+pydocstyle = "^6.1.1"
+pylint = "^2.15.8"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
