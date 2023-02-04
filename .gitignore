@@ -2,7 +2,5 @@
 *.pdf
 *.txt
 *.ipynb
-!requirements.txt
 .DS_Store
 .ipynb_checkpoints
-env

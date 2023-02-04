@@ -35,7 +35,7 @@ def txt2epub(txt_filepath: PosixPath, epub_filepath: PosixPath) -> None:
     )
 
 
-def images2txt(images: List[JpegImageFile], txt_filepath: PosixPath):
+def images2txt(images: List[JpegImageFile], txt_filepath: PosixPath) -> None:
     """Converts PIL images to a TXT file using OCR."""
     with open(txt_filepath, "w", encoding="utf-8") as file:
         for image in tqdm(images):
