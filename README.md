@@ -9,3 +9,6 @@ Convert .pdf documents to .txt and .epub using Optical Character Recognition in 
 2. Recognize and postprocess text on PIL Images using `Tesseract OCR`.
 3. Save the result text to `.txt`.
 4. Convert `.txt` to `.epub` using `Pandoc`.
+
+brew install poppler
+brew install tesseract-lang

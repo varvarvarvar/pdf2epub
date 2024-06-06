@@ -2,22 +2,18 @@
 import logging
 import os
 import re
-from pathlib import Path, PosixPath
-from typing import List
+from pathlib import Path
 
-import pypandoc
-import pytesseract
-from pdf2image import convert_from_path
+from pdf2image import convert_from_path as convert_pdf2images
 from PIL.JpegImagePlugin import JpegImageFile
+from pypandoc import convert_file as convert_txt2epub
+from pytesseract import image_to_string
 from tqdm import tqdm
 
 logging.getLogger().setLevel("INFO")
 
-LANG = "rus"
-SRC_FILE = Path("sample.pdf")
 
-
-def preprocess_text(text: str) -> str:
+def _preprocess_text(text: str) -> str:
     """Removes extra \n and double whitespaces from a string."""
     text = re.sub(
         "(?<![\r\n])(\r?\n|\r)(?![\r\n])", " ", text
@@ -28,28 +24,27 @@ def preprocess_text(text: str) -> str:
     return text
 
 
-def txt2epub(txt_filepath: PosixPath, epub_filepath: PosixPath) -> None:
+def _images2txt(images: list[JpegImageFile], txt_filepath: Path, lang: str) -> None:
+    """Converts PIL images to a TXT file using OCR."""
+    with open(txt_filepath, "w", encoding="utf-8") as file:
+        for image in tqdm(images):
+            text = image_to_string(image, lang=lang)
+            text = _preprocess_text(text)
+            file.write(f"{text}\n")
+
+
+def _txt2epub(txt_filepath: Path, epub_filepath: Path) -> None:
     """Converts TXT file to a EPUB file."""
-    pypandoc.convert_file(
+    convert_txt2epub(
         txt_filepath, format="markdown", to="epub", outputfile=epub_filepath
     )
 
 
-def images2txt(images: List[JpegImageFile], txt_filepath: PosixPath) -> None:
-    """Converts PIL images to a TXT file using OCR."""
-    with open(txt_filepath, "w", encoding="utf-8") as file:
-        for image in tqdm(images):
-            text = pytesseract.image_to_string(image, lang=LANG)
-            text = preprocess_text(text)
-            file.write(f"{text}\n")
-
-
-def pdf2epub(pdf_filpath: PosixPath) -> None:
+def pdf2epub(pdf_filpath: Path, lang: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
+    images = convert_pdf2images(pdf_filpath, fmt="jpeg")
     txt_filepath = pdf_filpath.with_suffix(".txt")
+    _images2txt(images, txt_filepath, lang)
     epub_filepath = pdf_filpath.with_suffix(".epub")
-
-    images = convert_from_path(pdf_filpath, fmt="jpeg")
-    images2txt(images, txt_filepath)
-    txt2epub(txt_filepath, epub_filepath)
+    _txt2epub(txt_filepath, epub_filepath)
     os.remove(txt_filepath)
