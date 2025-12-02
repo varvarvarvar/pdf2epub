@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pdf2txt2epub"
+name = "pdf2epub"
 version = "0.1.0"
 description = "PDF to EPUB converter."
 authors = ["varvara-krasavina <varvara.krasavina@gmail.com>"]
