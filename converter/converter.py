@@ -5,9 +5,9 @@ import logging
 import re
 from pathlib import Path
 
-from pdf2image import convert_from_path as convert_pdf2images
+from pdf2image import convert_from_path as convert_pdf_to_pil
 from PIL.JpegImagePlugin import JpegImageFile
-from pypandoc import convert_text as convert_txt2epub
+from pypandoc import convert_text as convert_text_to_epub
 from pytesseract import image_to_string
 from tqdm import tqdm
 
@@ -23,22 +23,22 @@ def _preprocess_text(text: str) -> str:
     return text
 
 
-def _images2txt(images: list[JpegImageFile], lang: str) -> str:
+def _images2txt(images: list[JpegImageFile], language: str) -> str:
     """Converts PIL images to a TXT file using OCR."""
     buf = io.StringIO()
     for image in tqdm(images, desc="Processing page"):
-        text = image_to_string(image, lang=lang)
+        text = image_to_string(image, lang=language)
         text = _preprocess_text(text)
         buf.write(text + "\n")
     text = buf.getvalue()
     return text
 
 
-def pdf2epub(pdf_filepath: Path, lang: str) -> None:
+def pdf2epub(pdf_filepath: Path, language: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
-    images = convert_pdf2images(pdf_filepath, fmt="jpeg")
-    text = _images2txt(images, lang)
+    images = convert_pdf_to_pil(pdf_filepath, fmt="jpeg")
+    text = _images2txt(images, language)
 
-    convert_txt2epub(
+    convert_text_to_epub(
         text, format="markdown", to="epub", outputfile=pdf_filepath.with_suffix(".epub")
     )
