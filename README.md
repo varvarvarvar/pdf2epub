@@ -3,11 +3,20 @@
 Sometimes ebooks cannot display .pdf properly and that's when pdf2epub comes in handy.
 <br>
 <br>
-Convert .pdf documents to .epub using Optical Character Recognition in 3 simple steps:
+Convert .pdf documents to .epub using Optical Character Recognition.
 
-1. Convert input `.pdf` to PIL Images.
-2. Recognize and postprocess text on PIL Images using `Tesseract OCR`.
-3. Convert `.txt` to `.epub` using `Pandoc`.
+## Running API backend
 
+```bash
+poetry install --all-extras
+poetry run python -m converter
+```
+
+This should set up API Swagger on `http://localhost:8000/docs#/`.
+
+## Prerequisites on Mac OS
+
+```
 brew install poppler
 brew install tesseract-lang
+```
