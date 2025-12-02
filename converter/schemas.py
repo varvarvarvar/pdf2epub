@@ -1,21 +1,31 @@
 """Data schemas and validations."""
 
-from pathlib import Path
-from typing import Annotated
-
-from pydantic import AfterValidator, BaseModel
+from fastapi import Form, HTTPException
+from pydantic import BaseModel
 from pytesseract import get_languages
 
 
-def is_supported_language(language: str) -> str:
+def is_supported_language(language: str) -> bool:
     """Checks is the input language is supported."""
-    if language not in get_languages():
-        raise KeyError(f"Language {language} is not supported.")
-    return language
+    return language in get_languages()
 
 
 class Request(BaseModel):
     """API request schema."""
 
-    filepath: Path
-    language: Annotated[str, AfterValidator(is_supported_language)]
+    language: str
+
+
+def get_request(language: str = Form(...)) -> Request:
+    """Re-raises pydantic exceptions to pass them to FastAPI."""
+    if not is_supported_language(language):
+        detail = [
+            {
+                "type": "value_error.language_not_supported",
+                "loc": ["body", "language"],
+                "msg": f"Unsupported language code: {language}",
+                "input": language,
+            }
+        ]
+        raise HTTPException(status_code=422, detail=detail)
+    return Request(language=language)
