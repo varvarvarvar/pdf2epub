@@ -16,12 +16,10 @@ logging.getLogger().setLevel("INFO")
 
 def _preprocess_text(text: str) -> str:
     """Removes extra \n and double whitespaces from a string."""
-    text = re.sub(
-        "(?<![\r\n])(\r?\n|\r)(?![\r\n])", " ", text
-    )  # Repair sentences that have \n in the middle
-    text = "\n".join(
-        " ".join(line.split()) for line in text.split("\n")
-    )  # Remove extra whitespaces (pypandoc cannot convert them)
+    # Repair sentences that have \n in the middle
+    text = re.sub("(?<![\r\n])(\r?\n|\r)(?![\r\n])", " ", text)
+    # Remove extra whitespaces (pypandoc cannot convert them)
+    text = "\n".join(" ".join(line.split()) for line in text.split("\n"))
     return text
 
 
