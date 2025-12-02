@@ -10,7 +10,8 @@ pdf2image = "^1.17.0"
 pypandoc = "^1.16.2"
 pytesseract = "^0.3.13"
 tqdm = "^4.67.1"
-click = "^8.3.1"
+fastapi = "^0.123.4"
+uvicorn = "^0.38.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^7.0.0"
