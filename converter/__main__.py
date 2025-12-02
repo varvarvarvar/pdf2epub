@@ -1,8 +1,10 @@
 """Parse CLI argument and convert to .epub."""
+
 from pathlib import Path
 
 import click
 from pytesseract import get_languages
+
 from converter.converter import pdf2epub
 
 
@@ -20,4 +22,4 @@ def main(file, lang):
 
 
 if __name__ == "__main__":
-    main() # pylint: disable=no-value-for-parameter
+    main()  # pylint: disable=no-value-for-parameter

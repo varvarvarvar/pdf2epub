@@ -1,4 +1,5 @@
 """PDF to EPUB converter utils."""
+
 import logging
 import os
 import re
@@ -40,11 +41,11 @@ def _txt2epub(txt_filepath: Path, epub_filepath: Path) -> None:
     )
 
 
-def pdf2epub(pdf_filpath: Path, lang: str) -> None:
+def pdf2epub(pdf_filepath: Path, lang: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
-    images = convert_pdf2images(pdf_filpath, fmt="jpeg")
-    txt_filepath = pdf_filpath.with_suffix(".txt")
+    images = convert_pdf2images(pdf_filepath, fmt="jpeg")
+    txt_filepath = pdf_filepath.with_suffix(".txt")
     _images2txt(images, txt_filepath, lang)
-    epub_filepath = pdf_filpath.with_suffix(".epub")
+    epub_filepath = pdf_filepath.with_suffix(".epub")
     _txt2epub(txt_filepath, epub_filepath)
     os.remove(txt_filepath)
