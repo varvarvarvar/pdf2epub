@@ -4,7 +4,6 @@ import io
 import logging
 import re
 from pathlib import Path
-from typing import Generator
 
 from pdf2image import convert_from_path as convert_pdf2images
 from PIL.JpegImagePlugin import JpegImageFile
