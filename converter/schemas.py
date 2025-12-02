@@ -1,9 +1,6 @@
 """Data schemas and validations."""
 
-from pathlib import Path
-from typing import Annotated
-
-from pydantic import AfterValidator, BaseModel
+from pydantic import BaseModel, field_validator
 from pytesseract import get_languages
 
 
@@ -16,6 +13,9 @@ def is_supported_language(language: str) -> str:
 
 class Request(BaseModel):
     """API request schema."""
+    language: str
 
-    filepath: Path
-    language: Annotated[str, AfterValidator(is_supported_language)]
+    @field_validator("language")
+    def validate_language(cls, v):
+        is_supported_language(v)
+        return v

@@ -1,8 +1,9 @@
 """API endpoints definition."""
 
 import logging
+from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, Form, UploadFile
 from pytesseract import get_languages
 
 from converter.converter import pdf2epub
@@ -26,10 +27,11 @@ def supported_languages() -> list[str]:
 
 
 @app.post("/convert/", tags=["Convert"])
-def post_url(request: Request) -> dict:
+async def convert(file: UploadFile = File(...), language: str = Form(...)) -> dict:
     """Runs the file conversion."""
+    request = Request(language=language)
     logging.info(
-        "Received file %s and language code %s", request.filepath, request.language
+        "Received file %s and language code %s", file.filename, request.language
     )
-    pdf2epub(request.filepath, request.language)
+    pdf2epub(Path(file.filename), request.language)
     return {"response": "Successfully converted file"}

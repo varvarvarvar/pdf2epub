@@ -12,6 +12,8 @@ pytesseract = "^0.3.13"
 tqdm = "^4.67.1"
 fastapi = "^0.123.4"
 uvicorn = "^0.38.0"
+python-multipart = "^0.0.20"
+pydantic = "^2.12.5"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^7.0.0"

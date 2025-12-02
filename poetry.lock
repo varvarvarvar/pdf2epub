@@ -590,6 +590,17 @@ packaging = ">=21.3"
 Pillow = ">=8.0.0"
 
 [[package]]
+name = "python-multipart"
+version = "0.0.20"
+description = "A streaming multipart parser for Python"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "python_multipart-0.0.20-py3-none-any.whl", hash = "sha256:8a62d3a8335e06589fe01f2a3e178cdcc632f3fbe0d492ad9ee0ec35aab1f104"},
+    {file = "python_multipart-0.0.20.tar.gz", hash = "sha256:8dd0cab45b8e23064ae09147625994d090fa46f5b0d1e13af944c331a7fa9d13"},
+]
+
+[[package]]
 name = "pytokens"
 version = "0.3.0"
 description = "A Fast, spec compliant Python 3.14+ tokenizer that runs on older Pythons."
@@ -710,4 +721,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.6.3)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.4"
-content-hash = "f5272448b0930168cf3373096319d40fb4514cd57ef6967ab68da3bdf1403381"
+content-hash = "ab622af45ef6bb0dbad8a7f8fce9c70b74119da906f7fede41154671fed8fcdf"
