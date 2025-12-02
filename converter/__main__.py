@@ -1,25 +1,11 @@
 """Parse CLI argument and convert to .epub."""
 
-from pathlib import Path
+import uvicorn
 
-import click
-from pytesseract import get_languages
+from converter.router import app
 
-from converter.converter import pdf2epub
-
-
-@click.command()
-@click.option("--file", type=Path, required=True, help="Path to the .PDF file.")
-@click.option(
-    "--lang",
-    type=click.Choice(get_languages()),
-    required=True,
-    help=f"The .PDF file language.\nSupported languages:\n{get_languages()}.",
-)
-def main(file, lang):
-    """Parses CLI arguments and passes them to function call."""
-    pdf2epub(file, lang)
-
+API_HOST = "0.0.0.0"
+API_PORT = 8000
 
 if __name__ == "__main__":
-    main()  # pylint: disable=no-value-for-parameter
+    uvicorn.run(app, host=API_HOST, port=API_PORT)
