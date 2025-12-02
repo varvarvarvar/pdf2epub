@@ -4,14 +4,17 @@ import io
 import logging
 import re
 from pathlib import Path
+from typing import AsyncGenerator
 
-from pdf2image import convert_from_path as convert_pdf_to_pil
+from fastapi import File
+from pdf2image import convert_from_bytes as convert_pdf_to_pil
 from PIL.JpegImagePlugin import JpegImageFile
 from pypandoc import convert_text as convert_text_to_epub
 from pytesseract import image_to_string
-from tqdm import tqdm
 
 logging.getLogger().setLevel("INFO")
+
+CHUNK_SIZE = 1024 * 1024  # 1 MB
 
 
 def _preprocess_text(text: str) -> str:
@@ -26,7 +29,7 @@ def _preprocess_text(text: str) -> str:
 def _images2txt(images: list[JpegImageFile], language: str) -> str:
     """Converts PIL images to a TXT file using OCR."""
     buf = io.StringIO()
-    for image in tqdm(images, desc="Processing page"):
+    for image in images:
         text = image_to_string(image, lang=language)
         text = _preprocess_text(text)
         buf.write(text + "\n")
@@ -34,11 +37,24 @@ def _images2txt(images: list[JpegImageFile], language: str) -> str:
     return text
 
 
-def pdf2epub(pdf_filepath: Path, language: str) -> None:
+async def process_chunk(file: File, language: str) -> AsyncGenerator:
+    "Converts chunk of PDF file into text"
+    while chunk := await file.read(CHUNK_SIZE):
+        images = convert_pdf_to_pil(chunk, fmt="jpeg")
+        text = _images2txt(images, language)
+        yield text
+
+
+async def pdf2epub(file: File, language: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
-    images = convert_pdf_to_pil(pdf_filepath, fmt="jpeg")
-    text = _images2txt(images, language)
+    text = ""
+
+    async for text_chunk in process_chunk(file, language):
+        text += text_chunk
 
     convert_text_to_epub(
-        text, format="markdown", to="epub", outputfile=pdf_filepath.with_suffix(".epub")
+        text,
+        format="markdown",
+        to="epub",
+        outputfile=Path(file.filename).with_suffix(".epub"),
     )

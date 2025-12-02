@@ -1,7 +1,6 @@
 """API endpoints definition."""
 
 import logging
-from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, UploadFile
 from pytesseract import get_languages
@@ -34,5 +33,5 @@ async def convert(
     logging.info(
         "Received file %s with language code %s", file.filename, request.language
     )
-    pdf2epub(Path(file.filename), request.language)
+    await pdf2epub(file, request.language)
     return {"response": "Successfully converted file"}
