@@ -32,7 +32,7 @@ async def convert(
 ) -> dict:
     """Runs the file conversion."""
     logging.info(
-        "Received file %s and language code %s", file.filename, request.language
+        "Received file %s with language code %s", file.filename, request.language
     )
     pdf2epub(Path(file.filename), request.language)
     return {"response": "Successfully converted file"}

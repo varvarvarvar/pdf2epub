@@ -12,6 +12,7 @@ def is_supported_language(language: str) -> bool:
 
 class Request(BaseModel):
     """API request schema."""
+
     language: str
 
 
