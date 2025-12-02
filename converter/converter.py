@@ -47,10 +47,10 @@ async def process_chunk(file: File, language: str) -> AsyncGenerator:
 
 async def pdf2epub(file: File, language: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
-    text = ""
-
-    async for text_chunk in process_chunk(file, language):
-        text += text_chunk
+    chunks = []
+    async for chunk in process_chunk(file, language):
+        chunks.append(chunk)
+    text = ''.join(chunks)
 
     convert_text_to_epub(
         text,
