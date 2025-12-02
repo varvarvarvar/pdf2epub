@@ -37,7 +37,7 @@ def _images2txt(images: list[JpegImageFile], language: str) -> str:
     return text
 
 
-async def process_chunk(file: File, language: str) -> AsyncGenerator:
+async def _process_chunk(file: File, language: str) -> AsyncGenerator:
     "Converts chunk of PDF file into text"
     while chunk := await file.read(CHUNK_SIZE):
         images = convert_pdf_to_pil(chunk, fmt="jpeg")
@@ -47,10 +47,11 @@ async def process_chunk(file: File, language: str) -> AsyncGenerator:
 
 async def pdf2epub(file: File, language: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
+    logging.info("Processing PDF file ...")
     chunks = []
-    async for chunk in process_chunk(file, language):
+    async for chunk in _process_chunk(file, language):
         chunks.append(chunk)
-    text = ''.join(chunks)
+    text = "".join(chunks)
 
     convert_text_to_epub(
         text,
