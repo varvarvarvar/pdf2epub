@@ -24,9 +24,7 @@ def supported_languages():
 @app.post("/url/")
 def post_url(request: Request):
     logging.info(
-        "Received file %s and language code %s",
-        request.filepath,
-        request.language.language,
+        "Received file %s and language code %s", request.filepath, request.language
     )
-    pdf2epub(request.filepath, request.language.language)
+    pdf2epub(request.filepath, request.language)
     return {"response": "Successfully converted file"}

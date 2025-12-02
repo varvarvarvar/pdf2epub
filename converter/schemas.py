@@ -11,10 +11,6 @@ def is_supported_language(language: str) -> int:
     return language
 
 
-class Language(BaseModel):
-    language: Annotated[str, AfterValidator(is_supported_language)]
-
-
 class Request(BaseModel):
     filepath: Path
-    language: Language
+    language: Annotated[str, AfterValidator(is_supported_language)]
