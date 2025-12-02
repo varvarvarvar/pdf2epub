@@ -1,5 +1,6 @@
 """PDF to EPUB converter utils."""
 
+import io
 import logging
 import re
 from pathlib import Path
@@ -23,17 +24,22 @@ def _preprocess_text(text: str) -> str:
     return text
 
 
-def _images2txt(images: list[JpegImageFile], lang: str) -> Generator:
+def _images2txt(images: list[JpegImageFile], lang: str) -> str:
     """Converts PIL images to a TXT file using OCR."""
+    buf = io.StringIO()
     for image in tqdm(images, desc="Processing page"):
         text = image_to_string(image, lang=lang)
         text = _preprocess_text(text)
-        yield text
+        buf.write(text + "\n")
+    text = buf.getvalue()
+    return text
 
 
 def pdf2epub(pdf_filepath: Path, lang: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
     images = convert_pdf2images(pdf_filepath, fmt="jpeg")
-    text = "\n".join(_images2txt(images, lang))
-    epub_filepath = pdf_filepath.with_suffix(".epub")
-    convert_txt2epub(text, format="markdown", to="epub", outputfile=epub_filepath)
+    text = _images2txt(images, lang)
+
+    convert_txt2epub(
+        text, format="markdown", to="epub", outputfile=pdf_filepath.with_suffix(".epub")
+    )
