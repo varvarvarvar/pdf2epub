@@ -3,6 +3,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pytesseract import get_languages
 
 from converter.converter import pdf2epub
@@ -14,6 +15,13 @@ API_VERSION = "/v1"
 
 app = FastAPI(title="PDF to EPUB converter")
 version_router = APIRouter(prefix=API_VERSION)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8081"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @version_router.post("/buildinfo", tags=["Buildinfo"])
