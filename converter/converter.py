@@ -38,7 +38,7 @@ async def pdf2epub(file: File, language: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
     logging.info("Processing PDF file ...")
     bytes_file = await file.read()
-    images = convert_pdf_to_pil(bytes_file, "jpeg")
+    images = convert_pdf_to_pil(bytes_file, fmt="jpeg")
     text = _images2txt(images, language)
 
     convert_text_to_epub(
