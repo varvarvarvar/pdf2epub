@@ -1,13 +1,11 @@
 """PDF to EPUB converter utils."""
 
 import asyncio
-import io
 import logging
+import os
 import re
 from concurrent.futures import ProcessPoolExecutor
-from functools import partial
 from pathlib import Path
-from typing import AsyncGenerator
 
 from fastapi import File
 from pdf2image import convert_from_bytes as convert_pdf_to_pil
@@ -17,8 +15,7 @@ from pytesseract import image_to_string
 
 logging.getLogger().setLevel("INFO")
 
-CHUNK_SIZE = 1024 * 1024  # 1 MB
-executor = ProcessPoolExecutor()
+MAX_WORKERS = os.cpu_count()
 
 
 def _preprocess_text(text: str) -> str:
@@ -30,42 +27,37 @@ def _preprocess_text(text: str) -> str:
     return text
 
 
-def _images2txt(images: list[JpegImageFile], language: str) -> str:
+def _image2txt(image: JpegImageFile, language: str) -> str:
+    """Converts PIL image to a TXT file using OCR."""
+    text = image_to_string(image, lang=language)
+    return _preprocess_text(text)
+
+
+async def _images2txt(images: list[JpegImageFile], language: str) -> str:
     """Converts PIL images to a TXT file using OCR."""
-    buf = io.StringIO()
-    for image in images:
-        text = image_to_string(image, lang=language)
-        text = _preprocess_text(text)
-        buf.write(text + "\n")
-    text = buf.getvalue()
-    return text
-
-
-async def _process_chunk(file: File, language: str, chunk_size: int) -> AsyncGenerator:
-    """Converts chunk of PDF file into text."""
     loop = asyncio.get_running_loop()
+    with ProcessPoolExecutor(max_workers=MAX_WORKERS) as pool:
+        tasks = [
+            loop.run_in_executor(pool, _image2txt, image, language) for image in images
+        ]
+        text_chunks = await asyncio.gather(*tasks)
 
-    while chunk := await file.read(chunk_size):
-        images = await loop.run_in_executor(executor, convert_pdf_to_pil, chunk, "jpeg")
-        text = await loop.run_in_executor(executor, _images2txt, images, language)
-        yield text
+    return "\n".join(text_chunks)
 
 
-async def pdf2epub(file: File, language: str, chunk_size: int = CHUNK_SIZE) -> None:
+async def pdf2epub(file: File, language: str) -> None:
     """Converts PDF file to a EPUB file using OCR."""
     logging.info("Processing PDF file ...")
-    loop = asyncio.get_running_loop()
-    chunks = []
-    async for chunk in _process_chunk(file, language, chunk_size):
-        chunks.append(chunk)
-    text = "".join(chunks)
+    bytes_file = await file.read()
+    logging.info("Converting pdf to images")
+    images = convert_pdf_to_pil(bytes_file, fmt="jpeg")
+    logging.info("Converting images to text")
+    text = await _images2txt(images, language)
+    logging.info("Converting text to epub")
 
-    # Use partial to allow passing kwargs to executor
-    partial_convert_text_to_epub = partial(
-        convert_text_to_epub,
+    convert_text_to_epub(
         text,
         format="markdown",
         to="epub",
         outputfile=Path(file.filename).with_suffix(".epub"),
     )
-    await loop.run_in_executor(executor, partial_convert_text_to_epub)
