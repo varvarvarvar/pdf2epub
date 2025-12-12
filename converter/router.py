@@ -26,25 +26,25 @@ app.add_middleware(
 
 @version_router.post("/buildinfo", tags=["Buildinfo"])
 def get_buildinfo() -> dict:
-    """Checks that the service is operational by returning buildinfo."""
+    """Check that the service is operational by returning buildinfo."""
     return {"build_id": "Local"}
 
 
 @version_router.get("/languages/", tags=["Languages"])
 def supported_languages() -> list[str]:
-    """Returns the list of supported language codes."""
+    """Return the list of supported language codes."""
     return get_languages()
 
 
 @version_router.post("/convert/", tags=["Convert"])
-async def convert(
+def convert(
     file: UploadFile = File(...), request: Request = Depends(get_request)
 ) -> dict:
-    """Runs the file conversion."""
+    """Run the file conversion."""
     logging.info(
         "Received file %s with language code %s", file.filename, request.language
     )
-    await pdf2epub(file, request.language)
+    pdf2epub(file, request.language)
     return {"response": "Successfully converted file"}
 
 

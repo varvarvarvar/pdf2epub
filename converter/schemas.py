@@ -6,7 +6,7 @@ from pytesseract import get_languages
 
 
 def is_supported_language(language: str) -> bool:
-    """Checks is the input language is supported."""
+    """Check is the input language is supported."""
     return language in get_languages()
 
 
@@ -17,7 +17,7 @@ class Request(BaseModel):
 
 
 def get_request(language: str = Form(...)) -> Request:
-    """Re-raises pydantic exceptions to pass them to FastAPI."""
+    """Re-raise pydantic exceptions to pass them to FastAPI."""
     if not is_supported_language(language):
         detail = [
             {
